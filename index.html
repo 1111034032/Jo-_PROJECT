@@ -1,13 +1,27 @@
+<!DOCTYPE html>
 <html>
 
-<head>
-
-</head>
-
 <body>
-    <button style="width: 100px; height: 100px; background-color: aliceblue;">
-        PRESS ME
-    </button>
+    <button id="btn">點我</button>
+
+    <!-- <script>
+        const btn = document.getElementById('btn')
+
+        btn.addEventListener('click', () => {
+            console.log('button clicked')
+        })
+    </script> -->
+
+    <script>
+        const btn = document.getElementById('btn')
+
+        btn.addEventListener('click', async () => {
+            const res = await fetch('/api/test')
+            const data = await res.json()
+            console.log(data)
+        })
+    </script>
+
 </body>
 
 </html>
