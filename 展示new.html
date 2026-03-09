@@ -8,8 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            /* 現代、豐富的動態漸層背景 */
-            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            /* 現代、豐富的動態背景 - 單一粉色調 */
+            background-color: #fcc7d0;
             height: 100vh;
             margin: 0;
             overflow: hidden;
@@ -38,8 +38,8 @@
             /* Side-by-side Layout */
             gap: 40px;
             /* Space between Chat and Content Area */
-            padding: 100px 40px 20px 40px;
-            /* Top padding reserved for navbar, larger side paddings */
+            padding: 80px 40px 20px 40px;
+            /* Top padding reserved for thinner navbar, larger side paddings */
             /* Top padding to account for fixed navbar */
             box-sizing: border-box;
             position: relative;
@@ -88,19 +88,142 @@
                 opacity: 0;
             }
         }
+
+        /* 蜜桃色大球背景動畫 */
+        .bubbles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            /* Behind all content */
+            overflow: hidden;
+            pointer-events: none;
+            /* Let clicks pass through */
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -150px;
+            /* Start below the screen */
+            background: radial-gradient(circle at 30% 30%, rgba(255, 182, 193, 0.8), rgba(255, 127, 140, 0.4));
+            border-radius: 50%;
+            box-shadow: 0 8px 32px rgba(255, 150, 160, 0.2);
+            backdrop-filter: blur(2px);
+            animation: rise infinite ease-in;
+        }
+
+        /* Define rising and swaying animation */
+        @keyframes rise {
+            0% {
+                transform: translateY(0) scale(1) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            80% {
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: translateY(-120vh) scale(1.5) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Different bubble sizes and animation durations */
+        .bubble:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            left: 10%;
+            animation-duration: 15s;
+            animation-delay: 0s;
+        }
+
+        .bubble:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            left: 25%;
+            animation-duration: 22s;
+            animation-delay: 2s;
+        }
+
+        .bubble:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            left: 45%;
+            animation-duration: 18s;
+            animation-delay: 7s;
+        }
+
+        .bubble:nth-child(4) {
+            width: 150px;
+            height: 150px;
+            left: 65%;
+            animation-duration: 25s;
+            animation-delay: 4s;
+        }
+
+        .bubble:nth-child(5) {
+            width: 90px;
+            height: 90px;
+            left: 85%;
+            animation-duration: 20s;
+            animation-delay: 1s;
+        }
+
+        .bubble:nth-child(6) {
+            width: 110px;
+            height: 110px;
+            left: 50%;
+            animation-duration: 28s;
+            animation-delay: 10s;
+        }
+
+        .bubble:nth-child(7) {
+            width: 70px;
+            height: 70px;
+            left: 80%;
+            animation-duration: 16s;
+            animation-delay: 8s;
+        }
+
+        .bubble:nth-child(8) {
+            width: 130px;
+            height: 130px;
+            left: 15%;
+            animation-duration: 24s;
+            animation-delay: 12s;
+        }
     </style>
 </head>
 
 <body>
 
+    <!-- 背景泡泡容器 -->
+    <div class="bubbles">
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+    </div>
+
     <!-- Navbar -->
     <div
-        class="absolute top-0 left-0 w-full px-8 py-5 flex justify-between items-center z-50 bg-white/40 backdrop-blur-sm border-b border-white/40 shadow-sm">
+        class="absolute top-0 left-0 w-full px-8 py-2 md:py-3 flex justify-between items-center z-50 bg-white/40 backdrop-blur-sm border-b border-white/40 shadow-sm">
         <div class="flex items-center">
-            <img src="./img/醫院icon.png" alt="醫院Icon" class="h-16 w-auto drop-shadow-md">
+            <img src="./img/醫院icon.png" alt="醫院Icon" class="h-10 md:h-12 w-auto drop-shadow-md">
         </div>
         <div id="datetime-display"
-            class="text-2xl font-black text-indigo-950 tracking-wider drop-shadow-md bg-white/60 px-6 py-2 rounded-2xl backdrop-blur-md border border-white/50">
+            class="text-xl md:text-2xl font-black text-indigo-950 tracking-wider drop-shadow-md bg-white/60 px-4 py-1.5 md:py-2 rounded-xl md:rounded-2xl backdrop-blur-md border border-white/50">
         </div>
     </div>
 
@@ -131,7 +254,7 @@
         </div>
 
         <div class="nurse-container">
-            <img src="./img/output_perfect_ditherv5.gif" alt="Nurse" class="nurse-gif"
+            <img src="./img/slowedNurse.gif" alt="Nurse" class="nurse-gif"
                 onerror="this.src='https://via.placeholder.com/300x400?text=Nurse+GIF'">
         </div>
 
