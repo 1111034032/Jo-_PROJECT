@@ -34,8 +34,10 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            padding: 20px;
+            padding: 80px 20px 20px 20px;
+            /* Top padding to account for fixed navbar */
             box-sizing: border-box;
+            position: relative;
         }
 
         /* 下方內容大區塊的背景色 (稍微帶點透明與柔和藍) */
@@ -43,14 +45,17 @@
             background-color: rgba(255, 255, 255, 0.4);
             backdrop-filter: blur(5px);
             border: 1px solid rgba(255, 255, 255, 0.3);
+            min-height: 0;
+            /* Important for flex children to shrink properly */
         }
 
         /* 護士 GIF 固定位置 */
         .nurse-container {
             position: absolute;
-            bottom: 150px;
-            left: 100px;
-            width: 300px;
+            bottom: 20px;
+            left: 5%;
+            width: clamp(200px, 25vw, 300px);
+            /* Responsive width */
             /* 根據平板比例調整 */
             z-index: 10;
         }
@@ -58,6 +63,10 @@
         .nurse-gif {
             width: 100%;
             height: auto;
+            max-height: 50vh;
+            /* Prevent overflowing on short screens */
+            object-fit: contain;
+            object-position: bottom;
         }
 
         /* 打字機閃爍游標 */
@@ -78,32 +87,35 @@
 <body>
 
     <!-- Navbar -->
-    <div class="absolute top-0 left-0 w-full px-8 py-5 flex justify-between items-center z-50">
+    <div
+        class="absolute top-0 left-0 w-full px-8 py-5 flex justify-between items-center z-50 bg-white/40 backdrop-blur-sm border-b border-white/40 shadow-sm">
         <div class="flex items-center">
             <img src="/img/醫院icon.png" alt="醫院Icon" class="h-16 w-auto drop-shadow-md">
         </div>
         <div id="datetime-display"
-            class="text-2xl font-black text-indigo-950 tracking-wider drop-shadow-md bg-white/40 px-6 py-2 rounded-2xl backdrop-blur-md border border-white/50">
+            class="text-2xl font-black text-indigo-950 tracking-wider drop-shadow-md bg-white/60 px-6 py-2 rounded-2xl backdrop-blur-md border border-white/50">
         </div>
     </div>
 
     <div class="main-container relative">
 
-        <div class="w-full h-1/4 flex justify-end items-end mb-8 relative">
+        <div class="w-full flex-shrink-0 flex justify-end items-end mb-4 md:mb-8 relative z-20">
             <div id="chat-bubble"
-                class="speech-bubble relative bg-white rounded-3xl p-6 shadow-lg w-[calc(100%-150px)]">
-                <p id="instruction-text" class="text-2xl font-bold text-gray-700 min-h-[4rem]">
+                class="speech-bubble relative bg-white rounded-3xl p-4 md:p-6 shadow-lg w-[calc(100%-150px)] md:w-[calc(100%-250px)] ml-auto">
+                <p id="instruction-text"
+                    class="text-xl md:text-2xl font-bold text-gray-700 min-h-[3rem] md:min-h-[4rem]">
                 </p>
             </div>
         </div>
 
-        <div class="flex-grow flex justify-end items-start border-box">
+        <div class="flex-grow flex justify-end items-stretch border-box min-h-0 z-10 relative">
             <div id="content-area"
-                class="display-area rounded-3xl w-2/3 h-5/6 p-8 shadow-inner flex flex-col justify-center items-center text-center relative">
+                class="display-area rounded-3xl w-full md:w-3/4 lg:w-2/3 p-4 md:p-8 shadow-inner flex flex-col justify-center items-center text-center relative ml-auto mb-16 md:mb-0">
 
                 <!-- 初始掃碼畫面內容 -->
-                <div id="initial-scan-content" class="absolute inset-0 w-full h-full overflow-hidden rounded-3xl">
-                    <video src="/img/掃描手環示意影片.mp4" autoplay loop muted playsinline class="w-full h-full object-cover">
+                <div id="initial-scan-content" class="absolute inset-0 w-full h-full overflow-hidden rounded-3xl p-4">
+                    <video src="/img/掃描手環示意影片.mp4" autoplay loop muted playsinline
+                        class="w-full h-full object-contain bg-white/50 rounded-2xl">
                     </video>
                 </div>
 
@@ -262,9 +274,9 @@
 
                     // 顯示額溫槍使用教學影片
                     const tempVideoHtml = `
-                        <div id="temp-video-content" class="absolute inset-0 w-full h-full overflow-hidden rounded-3xl">
+                        <div id="temp-video-content" class="absolute inset-0 w-full h-full overflow-hidden rounded-3xl p-4">
                             <video src="/img/額溫槍使用教學影片.mp4" autoplay loop muted playsinline
-                                class="w-full h-full object-cover">
+                                class="w-full h-full object-contain bg-white/50 rounded-2xl">
                             </video>
                         </div>
                     `;
@@ -338,9 +350,9 @@
 
                     // 建立新的血壓模擬畫面 (暫時顯示血壓計圖示或指示)
                     const bpContentHtml = `
-                        <div id="bp-content" class="absolute inset-0 w-full h-full overflow-hidden rounded-3xl">
+                        <div id="bp-content" class="absolute inset-0 w-full h-full overflow-hidden rounded-3xl p-4">
                             <video src="/img/隧道式血壓計使用教學影片.mp4" autoplay loop muted playsinline
-                                class="w-full h-full object-cover">
+                                class="w-full h-full object-contain bg-white/50 rounded-2xl">
                             </video>
                         </div>
                     `;
