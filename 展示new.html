@@ -77,6 +77,16 @@
 
 <body>
 
+    <!-- Navbar -->
+    <div class="absolute top-0 left-0 w-full px-8 py-5 flex justify-between items-center z-50">
+        <div class="flex items-center">
+            <img src="../展示/img/醫院icon.png" alt="醫院Icon" class="h-16 w-auto drop-shadow-md">
+        </div>
+        <div id="datetime-display"
+            class="text-2xl font-black text-indigo-950 tracking-wider drop-shadow-md bg-white/40 px-6 py-2 rounded-2xl backdrop-blur-md border border-white/50">
+        </div>
+    </div>
+
     <div class="main-container relative">
 
         <div class="w-full h-1/4 flex justify-end items-end mb-8 relative">
@@ -169,8 +179,30 @@
             typeWriter();
         }
 
-        // 網頁載入後馬上執行初始設定打字效果
+        // 時間更新函式
+        function updateDateTime() {
+            const now = new Date();
+            const rocYear = now.getFullYear() - 1911;
+            const month = now.getMonth() + 1;
+            const date = now.getDate();
+            const days = ['禮拜日', '禮拜一', '禮拜二', '禮拜三', '禮拜四', '禮拜五', '禮拜六'];
+            const dayOfWeek = days[now.getDay()];
+
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+
+            const datetimeStr = `民國${rocYear}年${month}月${date}日 ${dayOfWeek} ${hours}:${minutes}:${seconds}`;
+            const display = document.getElementById('datetime-display');
+            if (display) {
+                display.innerText = datetimeStr;
+            }
+        }
+
+        // 網頁載入後馬上執行初始設定打字效果與時間
         document.addEventListener("DOMContentLoaded", () => {
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
             typeText('instruction-text', '您好！我是您的量測助手。\n請拿起掃碼機掃描您手上的手環', 60);
         });
 
