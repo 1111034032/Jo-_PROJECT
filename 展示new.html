@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧生命徵象量測機器人</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            /* 現代、豐富的動態漸層背景 */
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            font-family: "Microsoft JhengHei", sans-serif;
+        }
+
+        /* 對話框的對話尖角 */
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: 30px;
+            border-width: 30px 30px 0 0;
+            border-style: solid;
+            border-color: white transparent transparent transparent;
+        }
+
+        .main-container {
+            max-width: 1280px;
+            /* 適合 Surface Pro / Tablet 的寬度 */
+            margin: 0 auto;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* 下方內容大區塊的背景色 (稍微帶點透明與柔和藍) */
+        .display-area {
+            background-color: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* 護士 GIF 固定位置 */
+        .nurse-container {
+            position: absolute;
+            bottom: 150px;
+            left: 100px;
+            width: 300px;
+            /* 根據平板比例調整 */
+            z-index: 10;
+        }
+
+        .nurse-gif {
+            width: 100%;
+            height: auto;
+        }
+
+        /* 打字機閃爍游標 */
+        .typing-cursor {
+            font-weight: bold;
+            color: #374151;
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <div class="absolute top-0 left-0 w-full px-8 py-5 flex justify-between items-center z-50">
+        <div class="flex items-center">
+            <img src="../展示/img/醫院icon.png" alt="醫院Icon" class="h-16 w-auto drop-shadow-md">
+        </div>
+        <div id="datetime-display"
+            class="text-2xl font-black text-indigo-950 tracking-wider drop-shadow-md bg-white/40 px-6 py-2 rounded-2xl backdrop-blur-md border border-white/50">
+        </div>
+    </div>
+
+    <div class="main-container relative">
+
+        <div class="w-full h-1/4 flex justify-end items-end mb-8 relative">
+            <div id="chat-bubble"
+                class="speech-bubble relative bg-white rounded-3xl p-6 shadow-lg w-[calc(100%-150px)]">
+                <p id="instruction-text" class="text-2xl font-bold text-gray-700 min-h-[4rem]">
+                </p>
+            </div>
+        </div>
+
+        <div class="flex-grow flex justify-end items-start border-box">
+            <div id="content-area"
+                class="display-area rounded-3xl w-2/3 h-5/6 p-8 shadow-inner flex flex-col justify-center items-center text-center relative">
+
+                <!-- 初始掃碼畫面內容 -->
+                <div id="initial-scan-content" class="absolute inset-0 w-full h-full overflow-hidden rounded-3xl">
+                    <video src="../展示/img/掃描手環示意影片.mp4" autoplay loop muted playsinline
+                        class="w-full h-full object-cover">
+                    </video>
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="nurse-container">
+            <img src="../展示/img/output_perfect_ditherv5.gif" alt="Nurse" class="nurse-gif"
+                onerror="this.src='https://via.placeholder.com/300x400?text=Nurse+GIF'">
+        </div>
+
+        <button id="mock-scan-btn" onclick="handleScanSuccess()"
+            class="absolute bottom-4 right-4 bg-gray-400 hover:bg-gray-500 text-white px-3 py-2 rounded-lg text-sm shadow-md transition opacity-50 hover:opacity-100 z-50">
+            點擊模擬掃碼成功
+        </button>
+
+        <button id="mock-temp-btn" onclick="showTempResult()"
+            class="absolute bottom-4 right-4 bg-gray-400 hover:bg-gray-500 text-white px-3 py-2 rounded-lg text-sm shadow-md transition opacity-50 hover:opacity-100 z-50 hidden">
+            點擊模擬量測額溫成功
+        </button>
+
+        <button id="mock-bp-btn" onclick="showBpResult()"
+            class="absolute bottom-4 right-4 bg-gray-400 hover:bg-gray-500 text-white px-3 py-2 rounded-lg text-sm shadow-md transition opacity-50 hover:opacity-100 z-50 hidden">
+            點擊模擬量測血壓成功
+        </button>
+
+    </div>
+
+    <script>
+        let typingTimeout;
+
+        // 打字效果函式
+        function typeText(elementId, text, speed = 60) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+
+            // 確保清除上一段未完成的打字動畫
+            if (typingTimeout) {
+                clearTimeout(typingTimeout);
+            }
+
+            element.innerHTML = "";
+            let i = 0;
+
+            const cursorSpan = document.createElement('span');
+            cursorSpan.className = 'typing-cursor';
+            cursorSpan.innerText = '|';
+
+            function typeWriter() {
+                if (i < text.length) {
+                    let char = text.charAt(i);
+                    // 移除舊的游標
+                    if (element.lastChild === cursorSpan) {
+                        element.removeChild(cursorSpan);
+                    }
+
+                    if (char === '\n') {
+                        element.appendChild(document.createElement('br'));
+                    } else {
+                        element.appendChild(document.createTextNode(char));
+                    }
+                    // 重新加入游標
+                    element.appendChild(cursorSpan);
+
+                    i++;
+                    typingTimeout = setTimeout(typeWriter, speed);
+                } else if (element.lastChild !== cursorSpan) {
+                    element.appendChild(cursorSpan);
+                }
+            }
+            typeWriter();
+        }
+
+        // 時間更新函式
+        function updateDateTime() {
+            const now = new Date();
+            const rocYear = now.getFullYear() - 1911;
+            const month = now.getMonth() + 1;
+            const date = now.getDate();
+            const days = ['禮拜日', '禮拜一', '禮拜二', '禮拜三', '禮拜四', '禮拜五', '禮拜六'];
+            const dayOfWeek = days[now.getDay()];
+
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+
+            const datetimeStr = `民國${rocYear}年${month}月${date}日 ${dayOfWeek} ${hours}:${minutes}:${seconds}`;
+            const display = document.getElementById('datetime-display');
+            if (display) {
+                display.innerText = datetimeStr;
+            }
+        }
+
+        // 網頁載入後馬上執行初始設定打字效果與時間
+        document.addEventListener("DOMContentLoaded", () => {
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            typeText('instruction-text', '您好！我是您的量測助手。\n請拿起掃碼機掃描您手上的手環', 60);
+        });
+
+        // 處理掃碼成功邏輯
+        function handleScanSuccess() {
+            // 1. 隱藏原本的預設掃描畫面與模擬按鈕
+            const initialContent = document.getElementById('initial-scan-content');
+            if (initialContent) initialContent.classList.add('hidden');
+            const mockBtn = document.getElementById('mock-scan-btn');
+            if (mockBtn) mockBtn.classList.add('hidden');
+
+            // 2. 更新下方內容區塊為歡迎資訊
+            const contentArea = document.getElementById('content-area');
+            const welcomeHtml = `
+                <div id="welcome-content" class="flex flex-col items-center animate-fade-in">
+                    <div class="bg-gradient-to-tr from-green-400 to-emerald-500 rounded-full p-4 mb-6 shadow-lg shadow-green-200">
+                        <svg class="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <div class="text-4xl font-extrabold text-indigo-950 mb-4 tracking-wide">掃碼成功</div>
+                    <p class="text-2xl text-indigo-700/80 leading-relaxed font-medium bg-white/50 px-8 py-4 rounded-2xl border border-white/60">
+                        歡迎 <span class="text-indigo-600 font-black text-3xl">王大明</span> 先生<br>
+                        ID: <span class="tracking-wider font-mono text-indigo-900 bg-indigo-50/80 px-2 py-1 rounded-lg mt-2 inline-block">A123456789</span>
+                    </p>
+                </div>
+            `;
+            // 將原本的其他節點 (如 action-buttons) 保留，插入新的歡迎內容
+            contentArea.insertAdjacentHTML('afterbegin', welcomeHtml);
+
+            // 3. 設定倒數秒數與更新提示文字
+            let countdown = 5;
+
+            // 由於 typeText 會有動畫時間，第一次先印出完整文字
+            typeText('instruction-text', `掃碼成功！\n${countdown}秒後將自動跳轉至量測額溫...`, 60);
+
+            // 建立每秒執行的計時器
+            const timer = setInterval(() => {
+                countdown--;
+
+                // 確保清掉殘留的打字機動畫，防止兩者交錯導致文字重疊
+                if (typingTimeout) {
+                    clearTimeout(typingTimeout);
+                }
+
+                if (countdown > 0) {
+                    // 更新秒數 (只替換文字，不重新觸發打字動畫會比較順)
+                    document.getElementById('instruction-text').innerHTML =
+                        `掃碼成功！<br>${countdown}秒後將自動跳轉至量測額溫...<span class="typing-cursor">|</span>`;
+                } else {
+                    // 4. 倒數結束，執行跳轉至量測額溫的邏輯
+                    clearInterval(timer);
+
+                    // 更新提示文字並帶入打字效果
+                    typeText('instruction-text', '請您將額溫槍對準額頭，\n準備量測額溫...', 60);
+
+                    // 移除剛剛的歡迎畫面
+                    const welcomeContent = document.getElementById('welcome-content');
+                    if (welcomeContent) welcomeContent.remove();
+
+                    // 顯示額溫槍使用教學影片
+                    const tempVideoHtml = `
+                        <div id="temp-video-content" class="absolute inset-0 w-full h-full overflow-hidden rounded-3xl">
+                            <video src="../展示/img/額溫槍使用教學影片.mp4" autoplay loop muted playsinline
+                                class="w-full h-full object-cover">
+                            </video>
+                        </div>
+                    `;
+                    contentArea.insertAdjacentHTML('afterbegin', tempVideoHtml);
+
+                    // 顯示模擬量測額溫成功按鈕
+                    const mockTempBtn = document.getElementById('mock-temp-btn');
+                    if (mockTempBtn) mockTempBtn.classList.remove('hidden');
+                }
+            }, 1000);
+        }
+
+        // 處理模擬量測額溫成功邏輯
+        function showTempResult() {
+            // 隱藏影片與模擬按鈕
+            const tempVideoContent = document.getElementById('temp-video-content');
+            if (tempVideoContent) tempVideoContent.remove();
+
+            const mockTempBtn = document.getElementById('mock-temp-btn');
+            if (mockTempBtn) mockTempBtn.classList.add('hidden');
+
+            const contentArea = document.getElementById('content-area');
+
+            // 更新提示文字
+            typeText('instruction-text', '額溫量測完成！', 60);
+
+            // 建立新的額溫量測結果畫面內容
+            const tempHtml = `
+                <div id="temp-content" class="flex flex-col items-center animate-fade-in">
+                    <div class="relative mb-8">
+                        <div class="absolute inset-0 bg-emerald-400 rounded-full blur-2xl opacity-20 animate-pulse"></div>
+                        <div class="relative bg-gradient-to-br from-emerald-50 to-teal-50 px-12 py-8 rounded-[2rem] border-2 border-emerald-100 shadow-xl shadow-emerald-100/50">
+                            <div class="text-7xl font-black text-emerald-500 tracking-tight">36.5 <span class="text-4xl text-emerald-400 font-bold">℃</span></div>
+                        </div>
+                    </div>
+                    <p class="text-2xl text-indigo-800 font-bold tracking-wide">額溫量測完成</p>
+                </div>
+            `;
+            contentArea.insertAdjacentHTML('afterbegin', tempHtml);
+
+            // 自動倒數 5 秒跳轉至量測血壓
+            let countdown = 5;
+
+            // 更新提示文字
+            typeText('instruction-text', `額溫量測完成！\n${countdown}秒後將自動跳轉至量測血壓...`, 60);
+
+            // 建立每秒執行的計時器
+            const timer = setInterval(() => {
+                countdown--;
+
+                if (typingTimeout) {
+                    clearTimeout(typingTimeout);
+                }
+
+                const instructionP = document.getElementById('instruction-text');
+
+                if (countdown > 0) {
+                    if (instructionP) {
+                        instructionP.innerHTML = `額溫量測完成！<br>${countdown}秒後將自動跳轉至量測血壓...<span class="typing-cursor">|</span>`;
+                    }
+                } else {
+                    // 倒數結束，執行跳轉至量測血壓的邏輯
+                    clearInterval(timer);
+
+                    // 更新提示文字
+                    typeText('instruction-text', '請將您的手臂伸入血壓計隧道中，\n並按下機器上的開始按鈕...', 60);
+
+                    // 移除原本的額溫結果畫面
+                    const tempContent = document.getElementById('temp-content');
+                    if (tempContent) tempContent.remove();
+
+                    // 建立新的血壓模擬畫面 (暫時顯示血壓計圖示或指示)
+                    const bpContentHtml = `
+                        <div id="bp-content" class="absolute inset-0 w-full h-full overflow-hidden rounded-3xl">
+                            <video src="../展示/img/隧道式血壓計使用教學影片.mp4" autoplay loop muted playsinline
+                                class="w-full h-full object-cover">
+                            </video>
+                        </div>
+                    `;
+                    contentArea.insertAdjacentHTML('afterbegin', bpContentHtml);
+
+                    // 顯示模擬量測血壓成功按鈕
+                    const mockBpBtn = document.getElementById('mock-bp-btn');
+                    if (mockBpBtn) mockBpBtn.classList.remove('hidden');
+                }
+            }, 1000);
+        }
+
+        // 處理模擬量測血壓成功邏輯
+        function showBpResult() {
+            // 隱藏模擬按鈕
+            const mockBpBtn = document.getElementById('mock-bp-btn');
+            if (mockBpBtn) mockBpBtn.classList.add('hidden');
+
+            const contentArea = document.getElementById('content-area');
+
+            // 移除等待畫面
+            const bpWaitContent = document.getElementById('bp-content');
+            if (bpWaitContent) bpWaitContent.remove();
+
+            // 更新對話框文字為完成提示
+            typeText('instruction-text', '血壓量測完成！\n請確認您的數據是否正確。', 60);
+
+            // 建立血壓與脈搏結果畫面
+            const bpResultHtml = `
+                <div id="bp-result-content" class="flex flex-col items-center animate-fade-in w-full px-4">
+                    <div class="grid grid-cols-2 gap-6 w-full mb-8">
+                        <div class="bg-white/80 rounded-[2rem] p-8 border border-white shadow-[0_10px_40px_rgba(239,68,68,0.1)] flex flex-col items-center justify-center relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-red-100 rounded-bl-full opacity-50 -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
+                            <div class="text-red-400/80 font-bold text-lg mb-3 tracking-wider z-10">血壓 <span class="text-sm font-normal">SYS / DIA</span></div>
+                            <div class="text-6xl font-black text-gray-800 z-10 tracking-tighter">120<span class="text-4xl text-gray-300 mx-2 font-light">/</span>80</div>
+                            <div class="text-sm font-bold tracking-widest text-red-400/60 mt-2 z-10">mmHg</div>
+                        </div>
+                        <div class="bg-white/80 rounded-[2rem] p-8 border border-white shadow-[0_10px_40px_rgba(59,130,246,0.1)] flex flex-col items-center justify-center relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-blue-100 rounded-bl-full opacity-50 -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
+                            <div class="text-blue-400/80 font-bold text-lg mb-3 tracking-wider z-10">脈搏 <span class="text-sm font-normal">PULSE</span></div>
+                            <div class="flex items-baseline space-x-2 z-10">
+                                <div class="text-6xl font-black text-gray-800 tracking-tighter">72</div>
+                            </div>
+                            <div class="text-sm font-bold tracking-widest text-blue-400/60 mt-2 z-10">BPM</div>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 px-8 py-3 rounded-full shadow-sm flex items-center space-x-3">
+                        <div class="w-3 h-3 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(52,211,153,0.8)]"></div>
+                        <p class="text-xl text-emerald-700 font-bold tracking-wide">量測數值正常</p>
+                    </div>
+                </div>
+            `;
+            contentArea.insertAdjacentHTML('afterbegin', bpResultHtml);
+        }
+
+
+    </script>
+</body>
+
+</html>
