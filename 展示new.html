@@ -41,7 +41,7 @@
             /* Side-by-side Layout */
             gap: 40px;
             /* Space between Chat and Content Area */
-            padding: 70px 40px 10px 40px;
+            padding: 70px 30px 10px 40px;
             /* Top padding reserved for very thin navbar, larger side paddings */
             /* Top padding to account for fixed navbar */
             box-sizing: border-box;
@@ -246,7 +246,8 @@
         <!-- Right Side: Content Area -->
         <div class="w-2/3 flex-grow flex justify-end items-stretch border-box min-h-0 z-10 relative">
             <div id="content-area"
-                class="display-area rounded-3xl w-full p-8 shadow-inner flex flex-col justify-center items-center text-center relative">
+                class="display-area rounded-3xl w-full p-8 shadow-inner flex flex-col justify-center items-center text-center relative"
+                style="width: calc(100% + 10px); min-width: calc(100% + 10px);">
 
                 <!-- 初始掃碼畫面內容 -->
                 <div id="initial-scan-content" class="absolute inset-0 w-full h-full overflow-hidden rounded-3xl p-4">
