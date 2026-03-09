@@ -16,14 +16,17 @@
             font-family: "Microsoft JhengHei", sans-serif;
         }
 
-        /* 對話框的對話尖角 (改為朝右下或下方，因為現在在左側) */
+        /* 對話框的對話尖角 (置中朝下) */
         .speech-bubble::after {
             content: '';
             position: absolute;
-            bottom: -30px;
-            right: 40px;
-            /* Move the tail to the right side if nurse is in corner */
-            border-width: 30px 0 0 30px;
+            bottom: -20px;
+            left: 50%;
+            /* Center horizontally */
+            transform: translateX(-50%);
+            /* Adjust to exact center based on its width */
+            border-width: 20px 20px 0 20px;
+            /* Symmetrical border for center tail */
             border-style: solid;
             border-color: white transparent transparent transparent;
         }
@@ -60,7 +63,8 @@
             bottom: -10px;
             /* Align perfectly to the bottom edge */
             left: 5%;
-            width: clamp(240px, 30vw, 360px);
+            width: clamp(280px, 35vw, 420px);
+            /* 再次放大 */
             /* 1.2x larger than previous 200/25/300px */
             /* 根據平板比例調整 */
             z-index: 10;
@@ -69,7 +73,8 @@
         .nurse-gif {
             width: 100%;
             height: auto;
-            max-height: 60vh;
+            max-height: 70vh;
+            /* 跟著放寬最大高度限制 */
             /* Allowed to grow slightly more vertically */
             /* Prevent overflowing on short screens */
             object-fit: contain;
