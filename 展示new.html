@@ -284,6 +284,7 @@
 
     <script>
         let typingTimeout;
+        window.measurementResults = { temp: {}, bp: {}, warnings: [] };
 
         // 打字效果函式
         function typeText(elementId, text, speed = 60) {
@@ -465,6 +466,17 @@
             const statusDotColor = isNormal ? "bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]" : "bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.9)]";
 
             const tempValue = tempValueNum.toFixed(1);
+
+            // 儲存額溫量測紀錄
+            window.measurementResults.temp = {
+                value: tempValue,
+                statusText: tempStatusText,
+                isNormal: isNormal
+            };
+            if (!isNormal) {
+                window.measurementResults.warnings.push(`【額溫】 ${tempStatusText} (${tempValue}℃)`);
+            }
+
             const circleColor = isNormal ? "bg-emerald-400" : "bg-red-400";
             const textColor = isNormal ? "text-emerald-500" : "text-red-500";
             const unitColor = isNormal ? "text-emerald-400" : "text-red-400";
@@ -662,6 +674,23 @@
                 pulseValue = 60 + Math.floor(Math.random() * 40);
             }
 
+            // 儲存血壓脈搏量測紀錄
+            window.measurementResults.bp = {
+                sys: sysValue,
+                dia: diaValue,
+                pulse: pulseValue,
+                isNormal: isBpNormal,
+                statusText: statusText
+            };
+
+            if (!isBpNormal) {
+                let warningDetail = '';
+                if (statusText.includes("收縮")) warningDetail = `(${sysValue} mmHg)`;
+                else if (statusText.includes("舒張")) warningDetail = `(${diaValue} mmHg)`;
+                else warningDetail = `(${pulseValue} BPM)`;
+                window.measurementResults.warnings.push(`【血壓/脈搏】 ${statusText} ${warningDetail}`);
+            }
+
             // 計算收縮壓與舒張壓百分比 (假設 sys: 80-180, dia: 50-120)
             const sysMin = 80, sysMax = 180;
             let sysPercentage = ((sysValue - sysMin) / (sysMax - sysMin)) * 100;
@@ -740,6 +769,124 @@
             `;
 
             contentArea.insertAdjacentHTML('afterbegin', bpResultHtml);
+
+            // 自動倒數 5 秒跳轉至總覽畫面
+            let countdown = 5;
+            typeText('instruction-text', `血壓與脈搏量測完成！\n${countdown}秒後將為您整理量測總覽報告...`, 60);
+
+            const timer = setInterval(() => {
+                countdown--;
+                if (typingTimeout) clearTimeout(typingTimeout);
+                const instructionP = document.getElementById('instruction-text');
+
+                if (countdown > 0) {
+                    if (instructionP) {
+                        instructionP.innerHTML = `血壓與脈搏量測完成！<br>${countdown}秒後將為您整理量測總覽報告...<span class="typing-cursor">|</span>`;
+                    }
+                } else {
+                    clearInterval(timer);
+                    showSummaryResult();
+                }
+            }, 1000);
+        }
+
+        // 處理總覽報告邏輯
+        function showSummaryResult() {
+            const contentArea = document.getElementById('content-area');
+            const bpContent = document.getElementById('bp-result-content');
+            if (bpContent) bpContent.remove();
+
+            typeText('instruction-text', '全部量測完成！\n這是您的本次量測總覽報告。', 60);
+
+            const temp = window.measurementResults.temp || {};
+            const bp = window.measurementResults.bp || {};
+            const warnings = window.measurementResults.warnings || [];
+
+            let warningHtml = '';
+            if (warnings.length > 0) {
+                warningHtml = `
+                    <div class="w-full bg-red-50/90 border-l-4 border-red-500 p-6 rounded-2xl shadow-sm mb-8 text-left animate-fade-in backdrop-blur-sm">
+                        <div class="flex items-center mb-4">
+                            <svg class="w-8 h-8 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            <h3 class="text-2xl font-bold text-red-800 tracking-wider">異常警示提醒</h3>
+                        </div>
+                        <ul class="list-disc list-inside space-y-2 text-xl font-medium text-red-700 ml-2">
+                            ${warnings.map(w => `<li>${w}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            } else {
+                warningHtml = `
+                    <div class="w-full bg-emerald-50/90 border-l-4 border-emerald-500 p-6 rounded-2xl shadow-sm mb-8 text-left animate-fade-in backdrop-blur-sm">
+                        <div class="flex items-center">
+                            <svg class="w-8 h-8 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <h3 class="text-2xl font-bold text-emerald-800 tracking-wider">各項量測結果全數正常，請繼續保持！</h3>
+                        </div>
+                    </div>
+                `;
+            }
+
+            const getStatusColor = (isNormal) => isNormal ? "text-emerald-700 bg-emerald-100 border-emerald-300" : "text-red-700 bg-red-100 border-red-300";
+
+            const summaryHtml = `
+                <div id="summary-content" class="flex flex-col items-center animate-fade-in w-full px-8 max-w-4xl mx-auto z-10">
+                    
+                    <h2 class="text-4xl font-extrabold text-indigo-950 mb-8 tracking-widest drop-shadow-sm flex items-center">
+                        <svg class="w-10 h-10 mr-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        健康量測總覽報告
+                    </h2>
+
+                    ${warningHtml}
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full animate-fade-in">
+                        <!-- 額溫區塊 -->
+                        <div class="col-span-1 bg-white/80 backdrop-blur-md rounded-3xl p-6 border border-white shadow-xl ${!temp.isNormal ? 'ring-2 ring-red-400' : ''} flex flex-col justify-center">
+                            <div class="text-gray-500 font-bold mb-4 tracking-wider flex items-center justify-between">
+                                <span class="text-xl">額溫</span>
+                                <span class="text-sm px-3 py-1 rounded-full border-2 font-bold ${getStatusColor(temp.isNormal)}">${temp.statusText}</span>
+                            </div>
+                            <div class="flex items-baseline justify-center mb-2">
+                                <span class="text-6xl font-black ${temp.isNormal ? 'text-gray-800' : 'text-red-600'} drop-shadow-sm">${temp.value}</span>
+                                <span class="text-2xl text-gray-400 font-bold ml-2">℃</span>
+                            </div>
+                        </div>
+
+                        <!-- 血壓脈搏區塊 -->
+                        <div class="col-span-1 lg:col-span-2 bg-white/80 backdrop-blur-md rounded-3xl p-6 border border-white shadow-xl ${!bp.isNormal ? 'ring-2 ring-red-400' : ''} flex flex-col justify-center">
+                            <div class="text-gray-500 font-bold mb-6 tracking-wider flex items-center justify-between">
+                                <span class="text-xl">血壓與脈搏</span>
+                                <span class="text-sm px-3 py-1 rounded-full border-2 font-bold ${getStatusColor(bp.isNormal)}">${bp.statusText}</span>
+                            </div>
+                            
+                            <div class="flex flex-col md:flex-row justify-around items-center">
+                                <div class="flex flex-col items-center">
+                                    <span class="text-sm font-bold text-gray-400 mb-2">收縮/舒張壓 (SYS/DIA)</span>
+                                    <div class="flex flex-col xl:flex-row items-center whitespace-nowrap">
+                                        <div class="flex items-baseline">
+                                            <span class="text-5xl font-black ${(bp.sys >= 140 || bp.sys < 90) ? 'text-red-600' : 'text-gray-800'} drop-shadow-sm">${bp.sys}</span>
+                                            <span class="text-3xl text-gray-300 mx-2 font-light">/</span>
+                                            <span class="text-4xl font-bold ${(bp.dia >= 90 || bp.dia < 60) ? 'text-red-600' : 'text-gray-700'}">${bp.dia}</span>
+                                        </div>
+                                        <span class="text-base text-red-400/80 font-bold mt-1 xl:mt-0 xl:ml-2">mmHg</span>
+                                    </div>
+                                </div>
+                                <div class="h-px w-full md:h-16 md:w-px bg-gray-300 my-4 md:my-0 md:mx-4"></div>
+                                <div class="flex flex-col items-center">
+                                    <span class="text-sm font-bold text-gray-400 mb-2">脈搏 (PULSE)</span>
+                                    <div class="flex items-baseline whitespace-nowrap">
+                                        <span class="text-5xl font-black ${(bp.pulse >= 100 || bp.pulse < 60) ? 'text-red-600' : 'text-blue-600'} drop-shadow-sm">${bp.pulse}</span>
+                                        <span class="text-base text-blue-400/80 font-bold ml-2">BPM</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="mt-12 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-black text-2xl tracking-widest px-16 py-5 rounded-full shadow-[0_10px_20px_rgba(99,102,241,0.3)] transition-all hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(99,102,241,0.4)] active:translate-y-0" onclick="location.reload()">完成並重新開始</button>
+                </div>
+            `;
+
+            contentArea.insertAdjacentHTML('afterbegin', summaryHtml);
         }
 
 
