@@ -473,21 +473,73 @@
             const gradientFrom = isNormal ? "from-emerald-50" : "from-red-50";
             const gradientTo = isNormal ? "to-teal-50" : "to-orange-50";
 
+            // 計算溫度計進度條比例 (假設最低 34度最高 42度)
+            const minTemp = 34;
+            const maxTemp = 42;
+            let tempPercentage = ((tempValueNum - minTemp) / (maxTemp - minTemp)) * 100;
+            if (tempPercentage < 0) tempPercentage = 0;
+            if (tempPercentage > 100) tempPercentage = 100;
+
+            // 溫度計填滿顏色 (高於 37.5 偏紅，低於 36 偏藍，中間綠)
+            let barColor = "bg-gradient-to-r from-emerald-300 to-emerald-500";
+            if (tempValueNum >= 37.5) {
+                barColor = "bg-gradient-to-r from-orange-400 to-red-500";
+            } else if (tempValueNum < 36.0) {
+                barColor = "bg-gradient-to-r from-blue-300 to-blue-500";
+            }
+
             const tempHtml = `
-                <div id="temp-content" class="flex flex-col items-center animate-fade-in w-full px-4">
-                    <div class="${statusBgColor} border-2 ${statusBorderColor} px-8 py-3 rounded-full shadow-lg flex items-center space-x-4 mb-8 transform transition-all duration-500 hover:scale-105">
+                <div id="temp-content" class="flex flex-col items-center animate-fade-in w-full px-12 max-w-2xl mx-auto">
+                    <!-- 狀態膠囊 -->
+                    <div class="${statusBgColor} border-2 ${statusBorderColor} px-8 py-3 rounded-full shadow-lg flex items-center space-x-4 mb-10 transform transition-all duration-500 hover:scale-105">
                         <div class="w-4 h-4 rounded-full animate-pulse ${statusDotColor}"></div>
                         <p class="text-3xl ${statusTextColor} font-extrabold tracking-widest">${tempStatusText}</p>
                     </div>
-                    <div class="relative mb-8">
-                        <div class="absolute inset-0 ${circleColor} rounded-full blur-2xl opacity-20 animate-pulse"></div>
-                        <div class="relative bg-gradient-to-br ${gradientFrom} ${gradientTo} px-12 py-8 rounded-[2rem] border-2 ${borderColor} shadow-xl ${shadowColor}">
-                            <div class="text-7xl font-black ${textColor} tracking-tight">${tempValue} <span class="text-4xl ${unitColor} font-bold">℃</span></div>
+
+                    <!-- 主要數值區與溫度計結合 -->
+                    <div class="w-full bg-white/70 backdrop-blur-md rounded-[2.5rem] p-10 border border-white/50 shadow-2xl flex flex-col items-center relative overflow-hidden">
+                        <!-- 裝飾光暈 -->
+                        <div class="absolute -top-10 -right-10 w-40 h-40 ${circleColor} rounded-full blur-3xl opacity-20"></div>
+                        <div class="absolute -bottom-10 -left-10 w-40 h-40 ${circleColor} rounded-full blur-3xl opacity-20"></div>
+
+                        <!-- 數字顯示 -->
+                        <div class="relative bg-gradient-to-br ${gradientFrom} ${gradientTo} px-16 py-6 rounded-3xl border-2 ${borderColor} shadow-inner mb-10 z-10 w-full flex justify-center items-baseline">
+                            <span class="text-8xl font-black ${textColor} tracking-tight drop-shadow-sm">${tempValue}</span>
+                            <span class="text-5xl ${unitColor} font-bold ml-2">℃</span>
+                        </div>
+
+                        <!-- 溫度計 UI -->
+                        <div class="w-full z-10">
+                            <div class="flex justify-between text-sm font-bold text-gray-400 mb-2 px-1">
+                                <span>34℃</span>
+                                <span>36℃正常</span>
+                                <span>37.5℃發燒</span>
+                                <span>42℃</span>
+                            </div>
+                            <!-- 進度條外框與內框底色 -->
+                            <div class="h-6 w-full bg-gray-200/80 rounded-full shadow-inner overflow-hidden border border-gray-300/50 p-1">
+                                <!-- 進度條填滿 -->
+                                <div class="h-full rounded-full transition-all duration-1000 ease-out relative ${barColor}"
+                                     style="width: 0%;"
+                                     id="temp-progress-bar">
+                                     <!-- 閃爍的高光 -->
+                                     <div class="absolute top-0 left-0 w-full h-1/2 bg-white/30 rounded-full"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             `;
+
             contentArea.insertAdjacentHTML('afterbegin', tempHtml);
+
+            // 觸發進度條動畫
+            setTimeout(() => {
+                const progressBar = document.getElementById('temp-progress-bar');
+                if (progressBar) {
+                    progressBar.style.width = `${tempPercentage}%`;
+                }
+            }, 100);
 
             // 自動倒數 5 秒跳轉至量測血壓
             let countdown = 5;
@@ -610,31 +662,103 @@
                 pulseValue = 60 + Math.floor(Math.random() * 40);
             }
 
+            // 計算收縮壓與舒張壓百分比 (假設 sys: 80-180, dia: 50-120)
+            const sysMin = 80, sysMax = 180;
+            let sysPercentage = ((sysValue - sysMin) / (sysMax - sysMin)) * 100;
+            if (sysPercentage < 0) sysPercentage = 0;
+            if (sysPercentage > 100) sysPercentage = 100;
+
+            const diaMin = 50, diaMax = 120;
+            let diaPercentage = ((diaValue - diaMin) / (diaMax - diaMin)) * 100;
+            if (diaPercentage < 0) diaPercentage = 0;
+            if (diaPercentage > 100) diaPercentage = 100;
+
+            let sysBarColor = "bg-gradient-to-r from-emerald-300 to-emerald-500";
+            if (sysValue >= 140 || sysValue < 90) sysBarColor = "bg-gradient-to-r from-orange-400 to-red-500";
+
+            let diaBarColor = "bg-gradient-to-r from-emerald-300 to-emerald-500";
+            if (diaValue >= 90 || diaValue < 60) diaBarColor = "bg-gradient-to-r from-orange-400 to-red-500";
+
             const bpResultHtml = `
-                <div id="bp-result-content" class="flex flex-col items-center animate-fade-in w-full px-4">
-                    <div class="${statusBgColor} border-2 ${statusBorderColor} px-8 py-3 rounded-full shadow-lg flex items-center space-x-4 mb-8 transform transition-all duration-500 hover:scale-105">
+                <div id="bp-result-content" class="flex flex-col items-center animate-fade-in w-full px-12 max-w-4xl mx-auto">
+                    <!-- 狀態膠囊 -->
+                    <div class="${statusBgColor} border-2 ${statusBorderColor} px-8 py-3 rounded-full shadow-lg flex items-center space-x-4 mb-10 transform transition-all duration-500 hover:scale-105">
                         <div class="w-4 h-4 rounded-full animate-pulse ${statusDotColor}"></div>
                         <p class="text-3xl ${statusTextColor} font-extrabold tracking-widest">${statusText}</p>
                     </div>
-                    <div class="grid grid-cols-2 gap-6 w-full mb-8">
-                        <div class="bg-white/80 rounded-[2rem] p-8 border border-white shadow-[0_10px_40px_rgba(239,68,68,0.1)] flex flex-col items-center justify-center relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
+                    
+                    <div class="grid grid-cols-2 gap-8 w-full mb-8">
+                        <!-- 血壓卡片 -->
+                        <div class="bg-white/70 backdrop-blur-md rounded-[2.5rem] p-10 border border-white/50 shadow-2xl flex flex-col items-center justify-between relative overflow-hidden group transition-transform duration-300">
                             <div class="absolute top-0 right-0 w-32 h-32 bg-red-100 rounded-bl-full opacity-50 -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
-                            <div class="text-red-400/80 font-bold text-2xl mb-3 tracking-wider z-10">血壓 <span class="text-lg font-normal">SYS / DIA</span></div>
-                            <div class="text-6xl font-black z-10 tracking-tighter"><span class="${sysColor}">${sysValue}</span><span class="text-4xl text-gray-300 mx-2 font-light">/</span><span class="${diaColor}">${diaValue}</span></div>
-                            <div class="text-lg font-bold tracking-widest text-red-400/60 mt-2 z-10">mmHg</div>
+                            
+                            <div class="text-red-400/80 font-bold text-2xl mb-4 tracking-wider z-10">血壓 <span class="text-lg font-normal">SYS / DIA</span></div>
+                            <div class="text-6xl font-black z-10 tracking-tighter mb-2"><span class="${sysColor} drop-shadow-sm">${sysValue}</span><span class="text-4xl text-gray-300 mx-2 font-light">/</span><span class="${diaColor} drop-shadow-sm">${diaValue}</span></div>
+                            <div class="text-lg font-bold tracking-widest text-red-400/60 mb-6 z-10">mmHg</div>
+
+                            <!-- 血壓彩色標尺 (進度條) -->
+                            <div class="w-full z-10 flex flex-col space-y-4">
+                                <!-- 收縮壓進度 -->
+                                <div>
+                                    <div class="flex justify-between text-xs font-bold text-gray-400 mb-1 px-1">
+                                        <span>收縮壓 (SYS)</span>
+                                    </div>
+                                    <div class="h-3 w-full bg-gray-200/80 rounded-full shadow-inner overflow-hidden border border-gray-300/50">
+                                        <div class="h-full rounded-full transition-all duration-1000 ease-out relative ${sysBarColor}" 
+                                             style="width: 0%;" id="sys-progress-bar"></div>
+                                    </div>
+                                </div>
+                                <!-- 舒張壓進度 -->
+                                <div>
+                                    <div class="flex justify-between text-xs font-bold text-gray-400 mb-1 px-1">
+                                        <span>舒張壓 (DIA)</span>
+                                    </div>
+                                    <div class="h-3 w-full bg-gray-200/80 rounded-full shadow-inner overflow-hidden border border-gray-300/50">
+                                        <div class="h-full rounded-full transition-all duration-1000 ease-out relative ${diaBarColor}" 
+                                             style="width: 0%;" id="dia-progress-bar"></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="bg-white/80 rounded-[2rem] p-8 border border-white shadow-[0_10px_40px_rgba(59,130,246,0.1)] flex flex-col items-center justify-center relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
-                            <div class="absolute top-0 right-0 w-32 h-32 bg-blue-100 rounded-bl-full opacity-50 -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
-                            <div class="text-blue-400/80 font-bold text-2xl mb-3 tracking-wider z-10">脈搏 <span class="text-lg font-normal">PULSE</span></div>
-                            <div class="flex items-baseline space-x-2 z-10">
-                                <div class="text-6xl font-black ${pulseColor} tracking-tighter">${pulseValue}</div>
+
+                        <!-- 脈搏卡片 -->
+                        <div class="bg-white/70 backdrop-blur-md rounded-[2.5rem] p-10 border border-white/50 shadow-2xl flex flex-col items-center justify-center relative overflow-hidden group transition-transform duration-300">
+                            <!-- 會跳動的心電圖背景 SVG -->
+                            <div class="absolute inset-0 z-0 opacity-10 flex items-center justify-center overflow-hidden">
+                                <svg class="w-full h-full text-blue-500 scale-150 animate-pulse" viewBox="0 0 500 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0,75 L100,75 L125,25 L150,125 L175,25 L200,75 L500,75" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M-500,75 L-400,75 L-375,25 L-350,125 L-325,25 L-300,75 L0,75" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-blue-100 rounded-bl-full opacity-50 -mr-10 -mt-10 transition-transform group-hover:scale-110 z-0"></div>
+                            
+                            <div class="text-blue-400/80 font-bold text-2xl mb-6 tracking-wider z-10 flex items-center">
+                                脈搏 <span class="text-lg font-normal ml-2">PULSE</span>
+                            </div>
+                            
+                            <div class="flex items-center space-x-4 z-10 mb-4">
+                                <!-- 閃爍的心頭 Icon -->
+                                <svg class="w-12 h-12 ${pulseColor === 'text-gray-800' ? 'text-blue-400' : pulseColor} animate-bounce" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                                <div class="text-8xl font-black ${pulseColor} tracking-tighter drop-shadow-sm">${pulseValue}</div>
                             </div>
                             <div class="text-lg font-bold tracking-widest text-blue-400/60 mt-2 z-10">BPM</div>
                         </div>
                     </div>
                 </div>
             `;
+
             contentArea.insertAdjacentHTML('afterbegin', bpResultHtml);
+
+            // 觸發進度條動畫
+            setTimeout(() => {
+                const sysBar = document.getElementById('sys-progress-bar');
+                if (sysBar) sysBar.style.width = `${sysPercentage}%`;
+                const diaBar = document.getElementById('dia-progress-bar');
+                if (diaBar) diaBar.style.width = `${diaPercentage}%`;
+            }, 100);
         }
 
 
