@@ -366,14 +366,14 @@
             // 2. 更新下方內容區塊為歡迎資訊
             const contentArea = document.getElementById('content-area');
             const welcomeHtml = `
-                <div id="welcome-content" class="flex flex-col items-center animate-fade-in">
-                    <div class="bg-gradient-to-tr from-green-400 to-emerald-500 rounded-full p-4 mb-6 shadow-lg shadow-green-200">
-                        <svg class="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                <div id="welcome-content" class="flex flex-col items-center animate-fade-in my-8">
+                    <div class="bg-gradient-to-tr from-green-400 to-emerald-500 rounded-full p-6 mb-8 shadow-lg shadow-green-200">
+                        <svg class="w-20 h-20 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                     </div>
-                    <div class="text-4xl font-extrabold text-indigo-950 mb-4 tracking-wide">掃碼成功</div>
-                    <p class="text-2xl text-indigo-700/80 leading-relaxed font-medium bg-white/50 px-8 py-4 rounded-2xl border border-white/60">
-                        歡迎 <span class="text-indigo-600 font-black text-3xl">王大明</span> 先生<br>
-                        ID: <span class="tracking-wider font-mono text-indigo-900 bg-indigo-50/80 px-2 py-1 rounded-lg mt-2 inline-block">A123456789</span>
+                    <div class="text-6xl font-extrabold text-indigo-950 mb-8 tracking-wide drop-shadow-sm">掃碼成功</div>
+                    <p class="text-3xl text-indigo-700/80 leading-relaxed font-medium bg-white/60 px-12 py-6 rounded-3xl border border-white max-w-2xl text-center shadow-md">
+                        歡迎 <span class="text-indigo-600 font-black text-5xl mx-2 drop-shadow-sm">王大明</span> 先生<br>
+                        ID: <span class="tracking-wider font-mono font-bold text-indigo-800 bg-indigo-50/80 px-4 py-2 rounded-xl mt-4 inline-block border border-indigo-100 shadow-inner">A123456789</span>
                     </p>
                 </div>
             `;
@@ -734,9 +734,9 @@
 
                             <div class="absolute top-0 right-0 w-32 h-32 bg-red-100 rounded-bl-full opacity-50 -mr-10 -mt-10 transition-transform group-hover:scale-110 z-0"></div>
                             
-                            <div class="text-red-400/80 font-bold text-2xl mb-6 tracking-wider z-10">血壓 <span class="text-lg font-normal ml-2">SYS / DIA</span></div>
+                            <div class="text-red-400/80 font-bold text-3xl mb-6 tracking-wider z-10">血壓 <span class="text-xl font-normal ml-2">SYS / DIA</span></div>
                             <div class="text-6xl font-black z-10 tracking-tighter mb-4"><span class="${sysColor} drop-shadow-sm">${sysValue}</span><span class="text-4xl text-gray-300 mx-2 font-light">/</span><span class="${diaColor} drop-shadow-sm">${diaValue}</span></div>
-                            <div class="text-lg font-bold tracking-widest text-red-400/60 z-10 bg-white/50 px-4 py-1 rounded-full backdrop-blur-sm border border-white/80">mmHg</div>
+                            <div class="text-2xl font-bold tracking-widest text-red-500/80 z-10 bg-white/50 px-5 py-2 rounded-full backdrop-blur-sm border border-white/80 shadow-sm">mmHg</div>
                         </div>
 
                         <!-- 脈搏卡片 -->
@@ -751,8 +751,8 @@
 
                             <div class="absolute top-0 right-0 w-32 h-32 bg-blue-100 rounded-bl-full opacity-50 -mr-10 -mt-10 transition-transform group-hover:scale-110 z-0"></div>
                             
-                            <div class="text-blue-400/80 font-bold text-2xl mb-6 tracking-wider z-10 flex items-center">
-                                脈搏 <span class="text-lg font-normal ml-2">PULSE</span>
+                            <div class="text-blue-400/80 font-bold text-3xl mb-6 tracking-wider z-10 flex items-center">
+                                脈搏 <span class="text-xl font-normal ml-2">PULSE</span>
                             </div>
                             
                             <div class="flex items-center space-x-4 z-10 mb-4">
@@ -762,7 +762,7 @@
                                 </svg>
                                 <div class="text-8xl font-black ${pulseColor} tracking-tighter drop-shadow-sm">${pulseValue}</div>
                             </div>
-                            <div class="text-lg font-bold tracking-widest text-blue-400/60 z-10 bg-white/50 px-4 py-1 rounded-full backdrop-blur-sm border border-white/80">BPM</div>
+                            <div class="text-2xl font-bold tracking-widest text-blue-500/80 z-10 bg-white/50 px-5 py-2 rounded-full backdrop-blur-sm border border-white/80 shadow-sm">BPM</div>
                         </div>
                     </div>
                 </div>
