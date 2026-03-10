@@ -688,44 +688,33 @@
                     </div>
                     
                     <div class="grid grid-cols-2 gap-8 w-full mb-8">
-                        <!-- 血壓卡片 -->
-                        <div class="bg-white/70 backdrop-blur-md rounded-[2.5rem] p-10 border border-white/50 shadow-2xl flex flex-col items-center justify-between relative overflow-hidden group transition-transform duration-300">
-                            <div class="absolute top-0 right-0 w-32 h-32 bg-red-100 rounded-bl-full opacity-50 -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
-                            
-                            <div class="text-red-400/80 font-bold text-2xl mb-4 tracking-wider z-10">血壓 <span class="text-lg font-normal">SYS / DIA</span></div>
-                            <div class="text-6xl font-black z-10 tracking-tighter mb-2"><span class="${sysColor} drop-shadow-sm">${sysValue}</span><span class="text-4xl text-gray-300 mx-2 font-light">/</span><span class="${diaColor} drop-shadow-sm">${diaValue}</span></div>
-                            <div class="text-lg font-bold tracking-widest text-red-400/60 mb-6 z-10">mmHg</div>
-
-                            <!-- 血壓彩色標尺 (進度條) -->
-                            <div class="w-full z-10 flex flex-col space-y-4">
-                                <!-- 收縮壓進度 -->
-                                <div>
-                                    <div class="flex justify-between text-xs font-bold text-gray-400 mb-1 px-1">
-                                        <span>收縮壓 (SYS)</span>
-                                    </div>
-                                    <div class="h-3 w-full bg-gray-200/80 rounded-full shadow-inner overflow-hidden border border-gray-300/50">
-                                        <div class="h-full rounded-full transition-all duration-1000 ease-out relative ${sysBarColor}" 
-                                             style="width: 0%;" id="sys-progress-bar"></div>
-                                    </div>
-                                </div>
-                                <!-- 舒張壓進度 -->
-                                <div>
-                                    <div class="flex justify-between text-xs font-bold text-gray-400 mb-1 px-1">
-                                        <span>舒張壓 (DIA)</span>
-                                    </div>
-                                    <div class="h-3 w-full bg-gray-200/80 rounded-full shadow-inner overflow-hidden border border-gray-300/50">
-                                        <div class="h-full rounded-full transition-all duration-1000 ease-out relative ${diaBarColor}" 
-                                             style="width: 0%;" id="dia-progress-bar"></div>
-                                    </div>
+                        <!-- 血壓卡片 (懸浮泡泡風格) -->
+                        <div class="bg-white/70 backdrop-blur-md rounded-[2.5rem] p-10 border border-white/50 shadow-2xl flex flex-col items-center justify-center relative overflow-hidden group transition-transform duration-300 min-h-[300px]">
+                            <!-- 底部液體晃動波浪動畫 -->
+                            <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none rounded-[2.5rem]">
+                                <!-- 液位容器，控制液體高度，w-200% 確保波浪平緩 -->
+                                <div class="absolute top-[60%] left-1/2 w-[200%] aspect-square -translate-x-1/2 opacity-60 mix-blend-multiply">
+                                    <!-- 波浪 1 -->
+                                    <div class="absolute inset-0 rounded-[40%] bg-gradient-to-t from-red-400 to-red-300 animate-[spin_7s_linear_infinite]"></div>
+                                    <!-- 波浪 2 -->
+                                    <div class="absolute inset-0 rounded-[45%] bg-gradient-to-t from-orange-300 to-rose-300 animate-[spin_10s_linear_reverse_infinite] opacity-70"></div>
+                                    <!-- 波浪 3 (深色底) -->
+                                    <div class="absolute inset-0 rounded-[42%] bg-gradient-to-t from-red-500 to-orange-400 animate-[spin_12s_linear_infinite] opacity-50 mt-4"></div>
                                 </div>
                             </div>
+
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-red-100 rounded-bl-full opacity-50 -mr-10 -mt-10 transition-transform group-hover:scale-110 z-0"></div>
+                            
+                            <div class="text-red-400/80 font-bold text-2xl mb-6 tracking-wider z-10">血壓 <span class="text-lg font-normal ml-2">SYS / DIA</span></div>
+                            <div class="text-6xl font-black z-10 tracking-tighter mb-4"><span class="${sysColor} drop-shadow-sm">${sysValue}</span><span class="text-4xl text-gray-300 mx-2 font-light">/</span><span class="${diaColor} drop-shadow-sm">${diaValue}</span></div>
+                            <div class="text-lg font-bold tracking-widest text-red-400/60 z-10 bg-white/50 px-4 py-1 rounded-full backdrop-blur-sm border border-white/80">mmHg</div>
                         </div>
 
                         <!-- 脈搏卡片 -->
-                        <div class="bg-white/70 backdrop-blur-md rounded-[2.5rem] p-10 border border-white/50 shadow-2xl flex flex-col items-center justify-center relative overflow-hidden group transition-transform duration-300">
+                        <div class="bg-white/70 backdrop-blur-md rounded-[2.5rem] p-10 border border-white/50 shadow-2xl flex flex-col items-center justify-center relative overflow-hidden group transition-transform duration-300 min-h-[300px]">
                             <!-- 會跳動的心電圖背景 SVG -->
-                            <div class="absolute inset-0 z-0 opacity-10 flex items-center justify-center overflow-hidden">
-                                <svg class="w-full h-full text-blue-500 scale-150 animate-pulse" viewBox="0 0 500 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <div class="absolute inset-0 z-0 opacity-20 flex items-center justify-center overflow-hidden">
+                                <svg class="w-full h-full text-blue-600 scale-150 animate-pulse" viewBox="0 0 500 150" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M0,75 L100,75 L125,25 L150,125 L175,25 L200,75 L500,75" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
                                     <path d="M-500,75 L-400,75 L-375,25 L-350,125 L-325,25 L-300,75 L0,75" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
@@ -744,21 +733,13 @@
                                 </svg>
                                 <div class="text-8xl font-black ${pulseColor} tracking-tighter drop-shadow-sm">${pulseValue}</div>
                             </div>
-                            <div class="text-lg font-bold tracking-widest text-blue-400/60 mt-2 z-10">BPM</div>
+                            <div class="text-lg font-bold tracking-widest text-blue-400/60 z-10 bg-white/50 px-4 py-1 rounded-full backdrop-blur-sm border border-white/80">BPM</div>
                         </div>
                     </div>
                 </div>
             `;
 
             contentArea.insertAdjacentHTML('afterbegin', bpResultHtml);
-
-            // 觸發進度條動畫
-            setTimeout(() => {
-                const sysBar = document.getElementById('sys-progress-bar');
-                if (sysBar) sysBar.style.width = `${sysPercentage}%`;
-                const diaBar = document.getElementById('dia-progress-bar');
-                if (diaBar) diaBar.style.width = `${diaPercentage}%`;
-            }, 100);
         }
 
 
