@@ -829,7 +829,7 @@
             const getStatusColor = (isNormal) => isNormal ? "text-emerald-700 bg-emerald-100 border-emerald-300" : "text-red-700 bg-red-100 border-red-300";
 
             const summaryHtml = `
-                <div id="summary-content" class="flex flex-col items-center animate-fade-in w-full px-8 max-w-4xl mx-auto z-10 pt-4">
+                <div id="summary-content" class="flex flex-col items-center animate-fade-in w-full px-0 mx-auto z-10 pt-4">
 
                     ${warningHtml}
 
@@ -846,7 +846,7 @@
                         </div>
 
                         <!-- 血壓脈搏區塊 -->
-                        <div class="col-span-1 lg:col-span-2 bg-white/80 backdrop-blur-md rounded-3xl py-6 px-10 xl:px-12 border border-white shadow-xl ${!bp.isNormal ? 'ring-2 ring-red-400' : ''} flex flex-col h-full">
+                        <div class="col-span-1 lg:col-span-2 bg-white/80 backdrop-blur-md rounded-3xl p-6 border border-white shadow-xl ${!bp.isNormal ? 'ring-2 ring-red-400' : ''} flex flex-col h-full">
                             <div class="text-gray-500 font-bold mb-6 tracking-wider flex items-center justify-between">
                                 <span class="text-2xl">血壓與脈搏</span>
                             </div>
