@@ -62,10 +62,9 @@
             position: absolute;
             bottom: -15px;
             /* Align perfectly to the bottom edge */
-            left: 5%;
-            width: clamp(320px, 56vw, 480px);
-            /* 再次放大 */
-            /* 1.6x larger than previous 200/25/300px */
+            left: -1%;
+            width: clamp(380px, 65vw, 550px);
+            /* 再次放大 (約原始 1.8x) 並向左移動 */
             /* 根據平板比例調整 */
             z-index: 10;
         }
@@ -73,10 +72,8 @@
         .nurse-gif {
             width: 100%;
             height: auto;
-            max-height: 70vh;
-            /* 跟著放寬最大高度限制 */
-            /* Allowed to grow slightly more vertically */
-            /* Prevent overflowing on short screens */
+            max-height: 85vh;
+            /* 放寬最大高度限制，避免放大後被切頭 */
             object-fit: contain;
             object-position: bottom;
         }
