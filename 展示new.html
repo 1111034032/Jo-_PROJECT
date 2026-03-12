@@ -63,9 +63,9 @@
             bottom: -15px;
             /* Align perfectly to the bottom edge */
             left: 5%;
-            width: clamp(280px, 35vw, 420px);
+            width: clamp(320px, 56vw, 480px);
             /* 再次放大 */
-            /* 1.2x larger than previous 200/25/300px */
+            /* 1.6x larger than previous 200/25/300px */
             /* 根據平板比例調整 */
             z-index: 10;
         }
@@ -235,8 +235,9 @@
     <div class="main-container relative">
 
         <!-- Left Side: Chat Bubble -->
-        <div class="w-1/3 flex-shrink-0 flex justify-start items-start relative z-20">
-            <div id="chat-bubble" class="speech-bubble relative bg-white rounded-3xl p-6 shadow-lg w-full mt-4"
+        <div class="w-1/3 flex-shrink-0 flex flex-col justify-start items-center relative z-20 pt-[8vh] xl:pt-[12vh]">
+            <!-- 對話框 -->
+            <div id="chat-bubble" class="speech-bubble relative bg-white rounded-3xl p-6 shadow-lg w-full mb-4"
                 style="width: calc(100% + 20px); min-width: calc(100% + 20px); margin-left: -10px;">
                 <p id="instruction-text" class="text-2xl leading-relaxed font-bold text-gray-700 min-h-[5rem]">
                 </p>
@@ -260,6 +261,7 @@
             </div>
         </div>
 
+        <!-- 護士圖重新放回最外層以貼緊底部 -->
         <div class="nurse-container">
             <img src="./img/slowedNurse.gif" alt="Nurse" class="nurse-gif"
                 onerror="this.src='https://via.placeholder.com/300x400?text=Nurse+GIF'">
