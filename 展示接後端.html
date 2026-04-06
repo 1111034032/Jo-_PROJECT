@@ -62,9 +62,10 @@
             position: absolute;
             bottom: -15px;
             /* Align perfectly to the bottom edge */
-            left: -1%;
-            width: clamp(380px, 65vw, 550px);
-            /* 再次放大 (約原始 1.8x) 並向左移動 */
+            left: 5%;
+            width: clamp(280px, 35vw, 420px);
+            /* 再次放大 */
+            /* 1.2x larger than previous 200/25/300px */
             /* 根據平板比例調整 */
             z-index: 10;
         }
@@ -72,8 +73,10 @@
         .nurse-gif {
             width: 100%;
             height: auto;
-            max-height: 85vh;
-            /* 放寬最大高度限制，避免放大後被切頭 */
+            max-height: 70vh;
+            /* 跟著放寬最大高度限制 */
+            /* Allowed to grow slightly more vertically */
+            /* Prevent overflowing on short screens */
             object-fit: contain;
             object-position: bottom;
         }
@@ -233,7 +236,6 @@
 
         <!-- Left Side: Chat Bubble -->
         <div class="w-1/3 flex-shrink-0 flex justify-start items-start relative z-20">
-            <!-- 對話框 -->
             <div id="chat-bubble" class="speech-bubble relative bg-white rounded-3xl p-6 shadow-lg w-full mt-4"
                 style="width: calc(100% + 20px); min-width: calc(100% + 20px); margin-left: -10px;">
                 <p id="instruction-text" class="text-2xl leading-relaxed font-bold text-gray-700 min-h-[5rem]">
@@ -258,7 +260,6 @@
             </div>
         </div>
 
-        <!-- 護士圖重新放回最外層以貼緊底部 -->
         <div class="nurse-container">
             <img src="./img/slowedNurse.gif" alt="Nurse" class="nurse-gif"
                 onerror="this.src='https://via.placeholder.com/300x400?text=Nurse+GIF'">
@@ -846,25 +847,25 @@
 
                         <!-- 血壓脈搏區塊 -->
                         <div class="col-span-1 lg:col-span-2 bg-white/80 backdrop-blur-md rounded-3xl p-6 border border-white shadow-xl ${!bp.isNormal ? 'ring-2 ring-red-400' : ''} flex flex-col h-full">
-                            <div class="text-gray-500 font-bold mb-2 tracking-wider flex items-center justify-between">
+                            <div class="text-gray-500 font-bold mb-6 tracking-wider flex items-center justify-between">
                                 <span class="text-2xl">血壓與脈搏</span>
                             </div>
                             
                             <div class="flex flex-col md:flex-row justify-around items-center flex-grow">
                                 <div class="flex flex-col items-center">
-                                    <span class="text-base font-bold text-gray-400 mb-2">收縮/舒張壓 (SYS/DIA)</span>
+                                    <span class="text-sm font-bold text-gray-400 mb-2">收縮/舒張壓 (SYS/DIA)</span>
                                     <div class="flex flex-col xl:flex-row items-center whitespace-nowrap">
                                         <div class="flex items-baseline">
                                             <span class="text-6xl font-black ${(bp.sys >= 140 || bp.sys < 90) ? 'text-red-600' : 'text-gray-800'} drop-shadow-sm">${bp.sys}</span>
                                             <span class="text-3xl text-gray-300 mx-2 font-light">/</span>
                                             <span class="text-6xl font-black ${(bp.dia >= 90 || bp.dia < 60) ? 'text-red-600' : 'text-gray-700'} drop-shadow-sm">${bp.dia}</span>
-                                            <span class="text-base text-red-400/80 font-bold ml-2">mmHg</span>
                                         </div>
+                                        <span class="text-base text-red-400/80 font-bold mt-1 xl:mt-0 xl:ml-2">mmHg</span>
                                     </div>
                                 </div>
                                 <div class="h-px w-full md:h-16 md:w-px bg-gray-300 my-4 md:my-0 md:mx-4"></div>
                                 <div class="flex flex-col items-center">
-                                    <span class="text-base font-bold text-gray-400 mb-2">脈搏 (PULSE)</span>
+                                    <span class="text-sm font-bold text-gray-400 mb-2">脈搏 (PULSE)</span>
                                     <div class="flex items-baseline whitespace-nowrap">
                                         <span class="text-6xl font-black ${(bp.pulse >= 100 || bp.pulse < 60) ? 'text-red-600' : 'text-gray-800'} drop-shadow-sm">${bp.pulse}</span>
                                         <span class="text-base text-blue-400/80 font-bold ml-2">BPM</span>

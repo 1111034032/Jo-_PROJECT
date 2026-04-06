@@ -82,7 +82,7 @@
         <div class="w-full h-1/4 flex justify-end items-end mb-8 relative">
             <div id="chat-bubble"
                 class="speech-bubble relative bg-white rounded-3xl p-6 shadow-lg w-[calc(100%-150px)]">
-                <p id="instruction-text" class="text-2xl font-bold text-gray-700 min-h-[4rem]">
+                <p id="instruction-text" class="text-4xl leading-relaxed font-bold text-gray-700 min-h-[5rem]">
                 </p>
             </div>
         </div>
@@ -93,8 +93,7 @@
 
                 <!-- 初始掃碼畫面內容 -->
                 <div id="initial-scan-content" class="absolute inset-0 w-full h-full overflow-hidden rounded-3xl">
-                    <video src="../展示/img/掃描手環示意影片.mp4" autoplay loop muted playsinline
-                        class="w-full h-full object-cover">
+                    <video src="/img/掃描手環示意影片.mp4" autoplay loop muted playsinline class="w-full h-full object-cover">
                     </video>
                 </div>
 
@@ -103,7 +102,7 @@
         </div>
 
         <div class="nurse-container">
-            <img src="../展示/img/output_perfect_ditherv5.gif" alt="Nurse" class="nurse-gif"
+            <img src="/img/output_perfect_ditherv5.gif" alt="Nurse" class="nurse-gif"
                 onerror="this.src='https://via.placeholder.com/300x400?text=Nurse+GIF'">
         </div>
 
@@ -232,7 +231,7 @@
                     // 顯示額溫槍使用教學影片
                     const tempVideoHtml = `
                         <div id="temp-video-content" class="absolute inset-0 w-full h-full overflow-hidden rounded-3xl">
-                            <video src="../展示/img/額溫槍使用教學影片.mp4" autoplay loop muted playsinline
+                            <video src="/img/額溫槍使用教學影片.mp4" autoplay loop muted playsinline
                                 class="w-full h-full object-cover">
                             </video>
                         </div>
@@ -261,15 +260,27 @@
             typeText('instruction-text', '額溫量測完成！', 60);
 
             // 建立新的額溫量測結果畫面內容
+            const isNormal = Math.random() >= 0.5;
+            const tempStatusText = isNormal ? "溫度正常" : "溫度不正常";
+            const statusTextColor = isNormal ? "text-emerald-600" : "text-red-500";
+            const tempValue = isNormal ? (36 + Math.random() * 1.4).toFixed(1) : (37.5 + Math.random() * 2).toFixed(1);
+            const circleColor = isNormal ? "bg-emerald-400" : "bg-red-400";
+            const textColor = isNormal ? "text-emerald-500" : "text-red-500";
+            const unitColor = isNormal ? "text-emerald-400" : "text-red-400";
+            const borderColor = isNormal ? "border-emerald-100" : "border-red-100";
+            const shadowColor = isNormal ? "shadow-emerald-100/50" : "shadow-red-100/50";
+            const gradientFrom = isNormal ? "from-emerald-50" : "from-red-50";
+            const gradientTo = isNormal ? "to-teal-50" : "to-orange-50";
+
             const tempHtml = `
                 <div id="temp-content" class="flex flex-col items-center animate-fade-in">
+                    <p class="text-3xl ${statusTextColor} font-bold tracking-wide mb-6">${tempStatusText}</p>
                     <div class="relative mb-8">
-                        <div class="absolute inset-0 bg-emerald-400 rounded-full blur-2xl opacity-20 animate-pulse"></div>
-                        <div class="relative bg-gradient-to-br from-emerald-50 to-teal-50 px-12 py-8 rounded-[2rem] border-2 border-emerald-100 shadow-xl shadow-emerald-100/50">
-                            <div class="text-7xl font-black text-emerald-500 tracking-tight">36.5 <span class="text-4xl text-emerald-400 font-bold">℃</span></div>
+                        <div class="absolute inset-0 ${circleColor} rounded-full blur-2xl opacity-20 animate-pulse"></div>
+                        <div class="relative bg-gradient-to-br ${gradientFrom} ${gradientTo} px-12 py-8 rounded-[2rem] border-2 ${borderColor} shadow-xl ${shadowColor}">
+                            <div class="text-7xl font-black ${textColor} tracking-tight">${tempValue} <span class="text-4xl ${unitColor} font-bold">℃</span></div>
                         </div>
                     </div>
-                    <p class="text-2xl text-indigo-800 font-bold tracking-wide">額溫量測完成</p>
                 </div>
             `;
             contentArea.insertAdjacentHTML('afterbegin', tempHtml);
@@ -308,7 +319,7 @@
                     // 建立新的血壓模擬畫面 (暫時顯示血壓計圖示或指示)
                     const bpContentHtml = `
                         <div id="bp-content" class="absolute inset-0 w-full h-full overflow-hidden rounded-3xl">
-                            <video src="../展示/img/隧道式血壓計使用教學影片.mp4" autoplay loop muted playsinline
+                            <video src="/img/隧道式血壓計使用教學影片.mp4" autoplay loop muted playsinline
                                 class="w-full h-full object-cover">
                             </video>
                         </div>
@@ -338,27 +349,59 @@
             typeText('instruction-text', '血壓量測完成！\n請確認您的數據是否正確。', 60);
 
             // 建立血壓與脈搏結果畫面
+            const isBpNormal = Math.random() >= 0.5;
+            let sysValue = 120, diaValue = 80, pulseValue = 72;
+            let statusText = "量測數值正常";
+            let statusTextColor = "text-emerald-600";
+            let sysColor = "text-gray-800", diaColor = "text-gray-800", pulseColor = "text-gray-800";
+
+            if (!isBpNormal) {
+                const abnormalType = Math.floor(Math.random() * 3); // 0: sys, 1: dia, 2: pulse
+                if (abnormalType === 0) {
+                    sysValue = 140 + Math.floor(Math.random() * 40);
+                    sysColor = "text-red-500";
+                    statusText = "收縮壓異常";
+                } else if (abnormalType === 1) {
+                    diaValue = 90 + Math.floor(Math.random() * 20);
+                    diaColor = "text-red-500";
+                    statusText = "舒張壓異常";
+                } else {
+                    pulseValue = Math.random() > 0.5 ? (100 + Math.floor(Math.random() * 30)) : (40 + Math.floor(Math.random() * 15));
+                    pulseColor = "text-red-500";
+                    statusText = "脈搏異常";
+                }
+                statusTextColor = "text-red-500";
+                // 產生正常的另外兩個數值
+                if (abnormalType !== 0) sysValue = 100 + Math.floor(Math.random() * 20);
+                if (abnormalType !== 1) diaValue = 60 + Math.floor(Math.random() * 20);
+                if (abnormalType !== 2) pulseValue = 60 + Math.floor(Math.random() * 40);
+            } else {
+                sysValue = 100 + Math.floor(Math.random() * 20);
+                diaValue = 60 + Math.floor(Math.random() * 20);
+                pulseValue = 60 + Math.floor(Math.random() * 40);
+            }
+
             const bpResultHtml = `
                 <div id="bp-result-content" class="flex flex-col items-center animate-fade-in w-full px-4">
+                    <div class="${statusBgColor} border-2 ${statusBorderColor} px-8 py-3 rounded-full shadow-lg flex items-center space-x-4 mb-8 transform transition-all duration-500 hover:scale-105">
+                        <div class="w-4 h-4 rounded-full animate-pulse ${statusDotColor}"></div>
+                        <p class="text-3xl ${statusTextColor} font-extrabold tracking-widest">${statusText}</p>
+                    </div>
                     <div class="grid grid-cols-2 gap-6 w-full mb-8">
                         <div class="bg-white/80 rounded-[2rem] p-8 border border-white shadow-[0_10px_40px_rgba(239,68,68,0.1)] flex flex-col items-center justify-center relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
                             <div class="absolute top-0 right-0 w-32 h-32 bg-red-100 rounded-bl-full opacity-50 -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
-                            <div class="text-red-400/80 font-bold text-lg mb-3 tracking-wider z-10">血壓 <span class="text-sm font-normal">SYS / DIA</span></div>
-                            <div class="text-6xl font-black text-gray-800 z-10 tracking-tighter">120<span class="text-4xl text-gray-300 mx-2 font-light">/</span>80</div>
-                            <div class="text-sm font-bold tracking-widest text-red-400/60 mt-2 z-10">mmHg</div>
+                            <div class="text-red-400/80 font-bold text-3xl mb-3 tracking-wider z-10">血壓 <span class="text-xl font-normal">SYS / DIA</span></div>
+                            <div class="text-6xl font-black z-10 tracking-tighter"><span class="${sysColor}">${sysValue}</span><span class="text-4xl text-gray-300 mx-2 font-light">/</span><span class="${diaColor}">${diaValue}</span></div>
+                            <div class="text-2xl font-bold tracking-widest text-red-500/80 mt-2 z-10 bg-white/50 px-5 py-2 rounded-full border border-red-50">mmHg</div>
                         </div>
                         <div class="bg-white/80 rounded-[2rem] p-8 border border-white shadow-[0_10px_40px_rgba(59,130,246,0.1)] flex flex-col items-center justify-center relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
                             <div class="absolute top-0 right-0 w-32 h-32 bg-blue-100 rounded-bl-full opacity-50 -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
-                            <div class="text-blue-400/80 font-bold text-lg mb-3 tracking-wider z-10">脈搏 <span class="text-sm font-normal">PULSE</span></div>
+                            <div class="text-blue-400/80 font-bold text-3xl mb-3 tracking-wider z-10">脈搏 <span class="text-xl font-normal">PULSE</span></div>
                             <div class="flex items-baseline space-x-2 z-10">
-                                <div class="text-6xl font-black text-gray-800 tracking-tighter">72</div>
+                                <div class="text-8xl font-black ${pulseColor} tracking-tighter">${pulseValue}</div>
                             </div>
-                            <div class="text-sm font-bold tracking-widest text-blue-400/60 mt-2 z-10">BPM</div>
+                            <div class="text-2xl font-bold tracking-widest text-blue-500/80 mt-2 z-10 bg-white/50 px-5 py-2 rounded-full border border-blue-50">BPM</div>
                         </div>
-                    </div>
-                    <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 px-8 py-3 rounded-full shadow-sm flex items-center space-x-3">
-                        <div class="w-3 h-3 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(52,211,153,0.8)]"></div>
-                        <p class="text-xl text-emerald-700 font-bold tracking-wide">量測數值正常</p>
                     </div>
                 </div>
             `;
